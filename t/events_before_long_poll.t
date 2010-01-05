@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use AnyEvent;
-use AnyMQ::MQ;
+use AnyMQ;
+use AnyMQ::Queue;
 
 my $tests = 3;
 
@@ -15,13 +16,16 @@ sub do_test {
 	my $cv = AE::cv;
 	my $t  = AE::timer 1, 0, sub { $cv->croak( "timeout" ); };
 
+	my $pub = AnyMQ->instance( $channel );
+	my $sub = AnyMQ::Queue->instance( $client );
+        $sub->subscribe($pub);
+
 	# Publish events before the client has connected.
-	my $pub = AnyMQ::MQ->instance( $channel );
 	$pub->publish( @send_events );
 
 	# Should be able to get published events.
-	my $sub = AnyMQ::MQ->instance( $channel );
-	$sub->poll_once($client, sub {
+
+	$sub->poll_once(sub {
 		my @events = @_;
 		is_deeply \@events, \@send_events, "got events";
 		$cv->send;

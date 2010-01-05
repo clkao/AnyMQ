@@ -1,18 +1,21 @@
 use Test::More;
-use AnyMQ::MQ;
+use strict;
+use AnyMQ;
+use AnyMQ::Queue;
 
 my $channel  = 'test1';
 
 my $clients = 5;
 my $inc     = 0;
 
+my $mq = AnyMQ->instance( $channel );
+
 for my $client ( 1 .. $clients ) {
-    my $sub = AnyMQ::MQ->instance( $channel );
-    $sub->poll_once($client, sub { $inc++ });
+    my $sub = AnyMQ::Queue->instance( $client, $mq );
+    $sub->poll_once(sub { $inc++ });
 }
 
-my $pub = AnyMQ::MQ->instance( $channel );
-$pub->publish({ data => 'hello' });
+$mq->publish({ data => 'hello' });
 
 is( $inc, $clients, 'messagequeue publish' );
 
