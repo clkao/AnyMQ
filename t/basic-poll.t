@@ -9,7 +9,7 @@ my $channel  = 'test';
 my $clients = 5;
 my $inc     = 0;
 
-my $mq = AnyMQ->instance( $channel );
+my $mq = AnyMQ->topic( $channel );
 
 for my $client ( 1 .. $clients ) {
     my $sub = AnyMQ::Queue->instance( $client, $mq );

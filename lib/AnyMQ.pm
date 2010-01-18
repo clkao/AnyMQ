@@ -1,48 +1,59 @@
 package AnyMQ;
-
 use strict;
 use 5.008_001;
 our $VERSION = '0.01';
 
 use AnyEvent;
-use Any::Moose;
-use Try::Tiny;
-use Scalar::Util;
-use Time::HiRes;
-use constant DEBUG => 0;
+use Moose;
+use AnyMQ::Topic;
 
-has channel => (is => 'rw', isa => 'Str');
-has queues  => (is => 'rw', isa => 'HashRef',  default => sub { +{} });
+with 'MooseX::Traits';
 
-my %instances;
+has '+_trait_namespace' => (default => 'AnyMQ::Trait');
 
-sub channels {
-    values %instances;
+has topics => (is => "ro", isa => "HashRef[AnyMQ::Topic]",
+               default => sub { {} });
+
+my $DEFAULT_BUS;
+
+sub topic {
+    my ($self, $name) = @_;
+    unless (ref($self)) {
+        $self = ($DEFAULT_BUS ||= $self->new);
+    }
+
+    $self->topics->{$name} ||= $self->new_topic( $name );
+}
+
+sub new_topic {
+    my ($self, $name) = @_;
+    AnyMQ::Topic->new( name => $name,
+                       bus  => $self );
 }
 
 sub instance {
-    my($class, $name) = @_;
-    $instances{$name} ||= $class->new(channel => $name);
+    my $self = shift;
+    warn "deprecated, use ->topic(name)";
+    $self->topic(@_);
 }
 
-sub publish {
-    my($self, @events) = @_;
-    for my $queue (values %{$self->queues}) {
-        if ($queue->destroyed) {
-            delete $self->queues->{$queue->name};
-            next;
-        }
+sub topic_constructor_args {
+    return ();
+}
 
-        $queue->publish(@events);
+sub new_listener {
+    my $self = shift;
+    unless (ref($self)) {
+        $self = ($DEFAULT_BUS ||= $self->new);
     }
+
+    AnyMQ::Queue->new;
 }
 
-sub subscribe {
-    my ($self, $queue) = @_;
-    $self->queues->{$queue->id} = $queue;
-}
-
+__PACKAGE__->meta->make_immutable;
+no Moose;
 1;
+
 __END__
 
 =encoding utf-8
@@ -56,8 +67,21 @@ AnyMQ -
 =head1 SYNOPSIS
 
   use AnyMQ;
-  my $mq = AnyMQ->instance($channel);
+  my $mq = AnyMQ->topic('Foo'); # gets an AnyMQ::Topic object
   $mq->publish({ message => 'Hello world'});
+
+  my $bus = AnyMQ->new_with_traits(traits => ['AMQP'],
+                                   host   => 'localhost',
+                                   port   => 5672,
+                                   user   => 'guest',
+                                   pass   => 'guest',
+                                   vhost  => '/',
+                                   exchange => '');
+
+  my $mq = $scope->topic('foo')
+  $mq->publish({ message => 'Hello world'});
+
+  # $bus->new_listener('client_id', $mq);
 
 =head1 DESCRIPTION
 

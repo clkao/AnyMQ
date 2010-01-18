@@ -7,7 +7,7 @@ my $channel  = 'test1';
 
 my $client_id = rand(1);
 
-my $pub = AnyMQ->instance( $channel );
+my $pub = AnyMQ->topic( $channel );
 
 my $sub = AnyMQ::Queue->instance( $client_id, $pub );
 $sub->poll_once(sub { ok(1, 'got message') });

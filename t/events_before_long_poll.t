@@ -16,7 +16,7 @@ sub do_test {
 	my $cv = AE::cv;
 	my $t  = AE::timer 1, 0, sub { $cv->croak( "timeout" ); };
 
-	my $pub = AnyMQ->instance( $channel );
+	my $pub = AnyMQ->topic( $channel );
 	my $sub = AnyMQ::Queue->instance( $client );
         $sub->subscribe($pub);
 

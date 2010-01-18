@@ -4,7 +4,7 @@ use strict;
 use AnyEvent;
 use Any::Moose;
 use Try::Tiny;
-use Scalar::Util;
+use Scalar::Util qw(weaken refaddr);
 use Time::HiRes;
 use constant DEBUG => 0;
 
@@ -16,14 +16,16 @@ has destroyed => (is => "rw", isa => "Bool", default => sub { 0 });
 
 my %instances;
 
-sub channels {
-    values %instances;
+sub BUILD {
+    my $self = shift;
+    $self->id('AnyMQ-'.refaddr($self)) unless $self->id;
 }
 
 sub instance {
     my($class, $name, @mq) = @_;
+    warn "deprecated, use ->new_listener()";
     $name ||= rand(1);
-    my $self = $instances{$name} ||= $class->new(id => $name);
+    my $self = $instances{$name} ||= $class->new;
     $self->subscribe($_) for @mq;
 
     return $self;
@@ -59,13 +61,13 @@ sub flush_events {
             $self->{cv}->cb($cb);
         } else {
             $self->{timer} = AE::timer 30, 0, sub {
-                Scalar::Util::weaken $self;
+                weaken $self;
                 warn "Sweep $self (no long-poll reconnect)";
                 undef $self;
                 # XXX: unsubscribe from all AnyMQ
 #                delete $self->clients->{$self_id};
             };
-            Scalar::Util::weaken $self->{timer};
+            weaken $self->{timer};
         }
     } catch {
         warn $_;
@@ -84,11 +86,11 @@ sub poll_once {
     # $timeout = 0 is a valid timeout for interval-polling
     $timeout = 55 unless defined $timeout;
     $self->{timer} = AE::timer $timeout || 55, 0, sub {
-        Scalar::Util::weaken $self;
+        weaken $self;
         warn "Timing out $self long-poll" if DEBUG;
         $self->flush_events;
     };
-    Scalar::Util::weaken $self->{timer};
+    weaken $self->{timer};
 
     # flush buffer for a long-poll client
     $self->flush_events( @{ $self->{buffer} });
