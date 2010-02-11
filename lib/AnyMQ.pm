@@ -6,6 +6,7 @@ our $VERSION = '0.01';
 use AnyEvent;
 use Moose;
 use AnyMQ::Topic;
+use AnyMQ::Queue;
 
 with 'MooseX::Traits';
 
