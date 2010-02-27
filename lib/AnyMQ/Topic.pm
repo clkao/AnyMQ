@@ -19,7 +19,7 @@ sub publish {
     my($self, @events) = @_;
     for my $queue (values %{$self->queues}) {
         if ($queue->destroyed) {
-            delete $self->queues->{$queue->name};
+            delete $self->queues->{$queue->id};
             next;
         }
 
