@@ -5,15 +5,17 @@ use 5.008_001;
 our $VERSION = '0.01';
 
 use AnyEvent;
-use Any::Moose;
+use Moose;
 use Try::Tiny;
 use Scalar::Util;
 use Time::HiRes;
-use constant DEBUG => 0;
+
+with 'MooseX::Traits';
 
 has name => (is => 'rw', isa => 'Str');
 has bus => (is => "ro", isa => "AnyMQ", weak_ref => 1);
 has queues  => (is => 'rw', isa => 'HashRef',  default => sub { +{} });
+has '+_trait_namespace' => (default => 'AnyMQ::Topic::Trait');
 
 sub publish {
     my($self, @events) = @_;
@@ -33,5 +35,5 @@ sub subscribe {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
+no Moose;
 1;
