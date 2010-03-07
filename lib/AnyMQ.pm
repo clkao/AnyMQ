@@ -32,16 +32,6 @@ sub new_topic {
                        bus  => $self );
 }
 
-sub instance {
-    my $self = shift;
-    warn "deprecated, use ->topic(name)";
-    $self->topic(@_);
-}
-
-sub topic_constructor_args {
-    return ();
-}
-
 sub new_listener {
     my $self = shift;
     unless (ref($self)) {
