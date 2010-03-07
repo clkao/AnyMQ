@@ -12,7 +12,7 @@ my $inc     = 0;
 my $mq = AnyMQ->topic( $channel );
 
 for my $client ( 1 .. $clients ) {
-    my $sub = AnyMQ::Queue->instance( $client, $mq );
+    my $sub = AnyMQ->new_listener( $mq );
     $sub->poll( sub {
         for ( @_ ) {
             ok exists $_->{data}, "check the message received.";

@@ -17,7 +17,7 @@ sub do_test {
 	my $t  = AE::timer 1, 0, sub { $cv->croak( "timeout" ); };
 
 	my $pub = AnyMQ->topic( $channel );
-	my $sub = AnyMQ::Queue->instance( $client );
+	my $sub = AnyMQ->new_listener( $pub );
         $sub->subscribe($pub);
 
 	# Publish events before the client has connected.
