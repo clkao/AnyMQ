@@ -23,4 +23,9 @@ memory_cycle_ok( $topic, 'no leaks in publisher' );
 # We''re actually relying on the poll_once test, hacky but not sure how to
 # verify
 
+$sub->poll(sub { });
+
+memory_cycle_ok( $sub, 'no leaks in subscriber' );
+memory_cycle_ok( $topic, 'no leaks in publisher' );
+
 done_testing;
