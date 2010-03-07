@@ -79,7 +79,8 @@ sub poll_once {
     weaken $self->{timer};
 
     # flush buffer for a long-poll client
-    $self->_flush( @{ $self->{buffer} });
+    $self->_flush( @{ $self->{buffer} })
+        if @{ $self->{buffer} };
 }
 
 sub poll {
