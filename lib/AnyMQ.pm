@@ -73,15 +73,16 @@ AnyMQ -
   my $mq = AnyMQ->topic('Foo'); # gets an AnyMQ::Topic object
   $mq->publish({ message => 'Hello world'});
 
-  my $bus = AnyMQ->new_with_traits(traits => ['AMQP'],
-                                   host   => 'localhost',
-                                   port   => 5672,
-                                   user   => 'guest',
-                                   pass   => 'guest',
-                                   vhost  => '/',
-                                   exchange => '');
+  #  bind to external message queue servers using traits.
+  #  my $bus = AnyMQ->new_with_traits(traits => ['AMQP'],
+  #                                   host   => 'localhost',
+  #                                   port   => 5672,
+  #                                   user   => 'guest',
+  #                                   pass   => 'guest',
+  #                                   vhost  => '/',
+  #                                   exchange => '');
+  #  my $mq = $bus->topic('foo')
 
-  my $mq = $scope->topic('foo')
   $mq->publish({ message => 'Hello world'});
 
   # $bus->new_listener('client_id', $mq);
@@ -96,7 +97,6 @@ to ensure proper message delivery.
 =head1 AUTHOR
 
 Tatsuhiki Miyagawa
-
 Chia-liang Kao
 
 =head1 LICENSE
