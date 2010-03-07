@@ -1,8 +1,6 @@
 package AnyMQ::Queue;
-use strict;
-
+use Moose;
 use AnyEvent;
-use Any::Moose;
 use Try::Tiny;
 use Scalar::Util qw(weaken refaddr);
 use Time::HiRes;
@@ -102,6 +100,9 @@ sub poll {
     $self->persistent(1);
 }
 
+
+__PACKAGE__->meta->make_immutable;
+no Moose;
 1;
 
 __END__
