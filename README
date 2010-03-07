@@ -1,17 +1,55 @@
 NAME
-    AnyMQ -
+    AnyMQ - Non-blocking message queue system based on AnyEvent
 
 SYNOPSIS
       use AnyMQ;
+      my $mq = AnyMQ->topic('Foo'); # gets an AnyMQ::Topic object
+      $mq->publish({ message => 'Hello world'});
+
+      #  bind to external message queue servers using traits.
+      #  my $bus = AnyMQ->new_with_traits(traits => ['AMQP'],
+      #                                   host   => 'localhost',
+      #                                   port   => 5672,
+      #                                   user   => 'guest',
+      #                                   pass   => 'guest',
+      #                                   vhost  => '/',
+      #                                   exchange => '');
+      #  my $mq = $bus->topic('foo')
+
+      $mq->publish({ message => 'Hello world'});
+
+      # $bus->new_listener('client_id', $mq);
 
 DESCRIPTION
-    AnyMQ is
+    AnyMQ is message queue system based on AnyEvent. It can store all
+    messages in memory or use external message queue servers.
 
-AUTHOR
-    Chia-liang Kao <clkao@clkao.org>
+    Messages are published to AnyMQ::Topic, and consumed with AnyMQ::Queue.
+
+METHODS
+  new
+    Returns a new AnyMQ object, which is a message bus that can associate
+    with arbitrary AnyMQ::Topic and consumed by AnyMQ::Queue
+
+  topic($name)
+    Returns a AnyMQ::Topic with given name. If called as class method, the
+    default bus will be used.
+
+  new_topic($name)
+    Creates and returns a new AnyMQ::Topic object with given name. This
+    should not be called directly.
+
+  new_listener(@topic)
+    Returns a new AnyMQ::Queue object, and subscribes to the optional given
+    topic. If called as class method, the default bus will be used.
+
+AUTHORS
+    Tatsuhiko Miyagawa Chia-liang Kao
 
 LICENSE
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
 SEE ALSO
+    AnyMQ::Topic, AnyMQ::Queue
+
