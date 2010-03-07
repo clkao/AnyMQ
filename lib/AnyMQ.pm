@@ -48,7 +48,9 @@ sub new_listener {
         $self = ($DEFAULT_BUS ||= $self->new);
     }
 
-    AnyMQ::Queue->new;
+    my $listener = AnyMQ::Queue->new;
+    $listener->subscribe(@_) if @_;
+    return $listener;
 }
 
 __PACKAGE__->meta->make_immutable;
