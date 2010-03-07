@@ -12,21 +12,9 @@ has buffer => (is => "ro", isa => "ArrayRef", default => sub { [] });
 has cv => (is => "rw", isa => "AnyEvent::CondVar", default => sub { AE::cv });
 has destroyed => (is => "rw", isa => "Bool", default => sub { 0 });
 
-my %instances;
-
 sub BUILD {
     my $self = shift;
     $self->id('AnyMQ-'.refaddr($self)) unless $self->id;
-}
-
-sub instance {
-    my($class, $name, @mq) = @_;
-    warn "deprecated, use ->new_listener()";
-    $name ||= rand(1);
-    my $self = $instances{$name} ||= $class->new;
-    $self->subscribe($_) for @mq;
-
-    return $self;
 }
 
 sub publish {
