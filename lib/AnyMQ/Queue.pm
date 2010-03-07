@@ -17,29 +17,29 @@ sub BUILD {
     $self->id('AnyMQ-'.refaddr($self)) unless $self->id;
 }
 
-sub publish {
-    my($self, @events) = @_;
+sub append {
+    my($self, @messages) = @_;
 
     if ($self->{cv}->cb) {
         # currently listening: flush and send the events right away
-        $self->flush_events(@events);
+        $self->_flush(@messages);
     } else {
         # between long poll comet: buffer the events
-        push @{$self->{buffer}}, @events;
+        push @{$self->{buffer}}, @messages;
     }
 }
 
 sub subscribe {
-    my ($self, $mq) = @_;
-    $mq->subscribe($self);
+    my ($self, $topic) = @_;
+    $topic->add_subscriber($self);
 }
 
-sub flush_events {
-    my($self, @events) = @_;
+sub _flush {
+    my($self, @messages) = @_;
 
     try {
         my $cb = $self->{cv}->cb;
-        $self->{cv}->send(@events);
+        $self->{cv}->send(@messages);
         $self->{cv} = AE::cv;
         $self->{buffer} = [];
 
@@ -74,12 +74,12 @@ sub poll_once {
     $self->{timer} = AE::timer $timeout || 55, 0, sub {
         weaken $self;
         warn "Timing out $self long-poll" if DEBUG;
-        $self->flush_events;
+        $self->_flush;
     };
     weaken $self->{timer};
 
     # flush buffer for a long-poll client
-    $self->flush_events( @{ $self->{buffer} });
+    $self->_flush( @{ $self->{buffer} });
 }
 
 sub poll {
@@ -105,66 +105,49 @@ AnyMQ::Queue - AnyMQ Message Queue
 
 =head1 SYNOPSIS
 
-To publish a message, you first create an instance of the AnyMQ on a
-specific channel, and an L<AnyMQ::Queue> instance that subscribes to
-it:
+  my $channel = AnyMQ->topic('Foo');
+  my $client = AnyMQ->new_listener($channel);
 
-    my $mq = AnyMQ->instance($channel);
-    my $client = AnyMQ::Queue->instance('client_id', $mq);
+  $client->poll_once(sub {
+      my @messages = @_;
+      # ...
+  });
 
-Later, you can poll for new messages:
-
-    $client->poll_once( sub { warn "got message: $_[0]"; } );
-
-    $client->poll(sub {
-        my @events = @_;
-        for my $event (@events) {
-            $self->stream_write($event);
-        }
-    });
+  $client->poll(sub {
+      my @messages = @_;
+      # ...
+  });
 
 =head1 DESCRIPTION
 
 An AnyMQ::Queue instance is a queue, each message put into the queue
-can be consumed once.  It's used as the client to L<AnyMQ>.  An
-AnyMQ::Queue can subscribe to multiple L<AnyMQ>.
-
-=head1 CONFIGURATION
-
-=over
-
-=item BacklogLength
-
-To configure the number of messages in the backlog, set 
-C<$AnyMQ::Queue::BacklogLength>.  By default, this is set to 30.
-
-=back
+can be consumed exactly once.  It's used as the client (or the
+subscriber in terms of pub/sub) in L<AnyMQ>.  An AnyMQ::Queue can
+subscribe to multiple L<AnyMQ::Topic>.
 
 =head1 METHODS
 
-=head2 publish
+=head2 subscribe($topic)
 
-This method publishes a message into the message queue, for immediate 
-consumption by all polling clients.
+Subscribe to a L<AnyMQ::Topic> object.
 
-=head2 poll($client_id, $code_ref)
+=head2 poll($code_ref)
 
-This is the event-driven poll mechanism, which accepts a callback as the
-second parameter. It will stream messages to the code ref passed in. 
+This is the event-driven poll mechanism, which accepts a callback.
+Messages are streamed to C<$code_ref> passed in.
 
-=head2 poll_once($client_id, $code_ref)
+=head2 poll_once($code_ref)
 
-This method returns all messages since the last poll to the code reference
-passed as the second parameter.
+This method returns all messages since the last poll to C<$code_ref>.
 
-=head1 AUTHOR
+=head2 append(@messages)
 
-Tatsuhiko Miyagawa
+Append messages directly to the queue.  You probably want to use
+C<publish> method of L<AnyMQ::Topic>
 
-Chia-liang Kao
 
 =head1 SEE ALSO
 
-L<Tatsumaki>
+L<AnyMQ> L<AnyMQ::Topic>
 
 =cut

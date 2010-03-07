@@ -55,7 +55,7 @@ __END__
 
 =head1 NAME
 
-AnyMQ -
+AnyMQ - Non-blocking message queue system based on AnyEvent
 
 =head1 SYNOPSIS
 
@@ -79,14 +79,38 @@ AnyMQ -
 
 =head1 DESCRIPTION
 
-AnyMQ::Queue is a simple message queue based on AnyEvent, storing all
-messages in memory or external mq.  polling requests are made with an
-L<AnyMQ::Queue> instance> as its client, which keeps track of buffer
-to ensure proper message delivery.
+AnyMQ is message queue system based on AnyEvent.  It can store all
+messages in memory or use external message queue servers.
 
-=head1 AUTHOR
+Messages are published to L<AnyMQ::Topic>, and consumed with
+L<AnyMQ::Queue>.
 
-Tatsuhiki Miyagawa
+=head1 METHODS
+
+=head2 new
+
+Returns a new L<AnyMQ> object, which is a message bus that can
+associate with arbitrary L<AnyMQ::Topic> and consumed by
+L<AnyMQ::Queue>
+
+=head2 topic($name)
+
+Returns a L<AnyMQ::Topic> with given name.  If called as class method,
+the default bus will be used.
+
+=head2 new_topic($name)
+
+Creates and returns a new L<AnyMQ::Topic> object with given name.
+This should not be called directly.
+
+=head2 new_listener(@topic)
+
+Returns a new L<AnyMQ::Queue> object, and subscribes to the optional
+given topic.  If called as class method, the default bus will be used.
+
+=head1 AUTHORS
+
+Tatsuhiko Miyagawa
 Chia-liang Kao
 
 =head1 LICENSE
@@ -95,5 +119,7 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 SEE ALSO
+
+L<AnyMQ::Topic>, L<AnyMQ::Queue>
 
 =cut
