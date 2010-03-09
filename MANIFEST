@@ -12,18 +12,23 @@ inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/Repository.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
+inc/Test/Builder/Module.pm
+inc/Test/Requires.pm
 lib/AnyMQ.pm
 lib/AnyMQ/Queue.pm
 lib/AnyMQ/Topic.pm
+lib/AnyMQ/Topic/Trait/WithBacklog.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
 t/00_compile.t
+t/backlog.t
 t/basic-poll.t
 t/basic.t
 t/cycle.t
 t/events_before_long_poll.t
+t/trait.t
 xt/perlcritic.t
 xt/pod.t
 xt/podspell.t
