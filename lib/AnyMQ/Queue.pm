@@ -87,6 +87,9 @@ sub poll {
     my($self, $cb) = @_;
     $self->cv->cb(sub { $cb->($_[0]->recv) });
     $self->persistent(1);
+
+    $self->_flush( @{ $self->{buffer} })
+        if @{ $self->{buffer} };
 }
 
 
