@@ -21,11 +21,12 @@ sub do_test {
     my $sub = AnyMQ->new_listener( $pub );
     $sub->poll_once(sub {
                         is $_[0]{data1}, $seq
-                    },
-                    1);
-    $sub->on_error(sub {
+                    });
+    $sub->timeout(1);
+    $sub->on_timeout(sub {
                        isa_ok($_[0], 'AnyMQ::Queue');
                        like($_[1], qr'timeout');
+                       $_[0]->destroyed(1);
                        $cv->send(1);
                    },
                );

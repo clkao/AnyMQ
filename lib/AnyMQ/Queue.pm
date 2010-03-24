@@ -11,8 +11,9 @@ has persistent => (is => "rw", isa => "Bool", default => sub { 0 });
 has buffer => (is => "ro", isa => "ArrayRef", default => sub { [] });
 has cv => (is => "rw", isa => "AnyEvent::CondVar", default => sub { AE::cv });
 has destroyed => (is => "rw", isa => "Bool", default => sub { 0 });
+has on_timeout => (is => "rw");
 has on_error  => (is => "rw");
-has reaper  => (is => "rw");
+has timeout => (is => "rw", isa => "Int");
 
 sub BUILD {
     my $self = shift;
@@ -39,21 +40,45 @@ sub subscribe {
 sub _flush {
     my ($self, @messages) = @_;
 
+    my $cb = $self->{cv}->cb;
+
     try {
-        my $cb = $self->{cv}->cb;
         $self->{cv}->send(@messages);
         $self->{cv} = AE::cv;
         $self->{buffer} = [];
-
-        if ($self->{persistent}) {
-            $self->{cv}->cb($cb);
-        } else {
-            $self->{timer} = $self->reaper->();
-        }
     } catch {
-        $self->on_error->($self, $_) if $self->on_error;
-        $self->destroyed(1);
+        if ($self->on_error) {
+            $self->on_error->($self, $_);
+        }
+        else {
+            $self->destroyed(1);
+        }
     };
+
+    return if $self->destroyed;
+
+    if ($self->{persistent}) {
+        $self->{cv}->cb($cb);
+    } else {
+        $self->{timer} = $self->_reaper;
+    }
+
+}
+
+sub _reaper {
+    my ($self, $timeout) = @_;
+    AnyEvent->timer(
+        after => $timeout || $self->timeout,
+        cb => sub {
+            weaken $self;
+            warn "Timing out $self long-poll" if DEBUG;
+            if ($self->on_timeout) {
+                $self->on_timeout->($self, "timeout")
+            }
+            else {
+                $self->destroyed(1);
+            }
+        });
 }
 
 sub poll_once {
@@ -64,17 +89,14 @@ sub poll_once {
     $self->{cv}->cb(sub { $cb->($_[0]->recv) });
 
     # reset garbage collection timeout with the long-poll timeout
-    $self->reaper(sub { AnyEvent->timer( after => $timeout || 55,
-                                         cb => sub {
-                                             weaken $self;
-                                             warn "Timing out $self long-poll" if DEBUG;
-                                             $self->on_error->($self, "timeout")
-                                                 if $self->on_error;
-                                             $self->destroyed(1);
-                                         });
-                    });
-    $self->{timer} = $self->reaper->();
-    weaken $self->{reaper};
+    # $timeout = 0 is a valid timeout for interval-polling
+    $timeout = 55 unless defined $timeout;
+    $self->{timer} = AE::timer $timeout || 55, 0, sub {
+        weaken $self;
+        warn "Timing out $self long-poll" if DEBUG;
+        $self->_flush;
+    };
+    weaken $self->{timer};
 
     # flush buffer for a long-poll client
     $self->_flush( @{ $self->{buffer} })

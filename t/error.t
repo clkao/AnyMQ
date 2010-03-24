@@ -22,6 +22,7 @@ sub do_test {
     $sub->on_error(sub {
                        isa_ok($_[0], 'AnyMQ::Queue');
                        like($_[1], qr'failed callback');
+                       $_[0]->destroyed(1);
                        $cv->send(1);
                    },
                );
@@ -30,7 +31,7 @@ sub do_test {
     $sub->poll(sub {
                   my $event = shift;
                   if ($event->{data2}) {
-                      Carp::confess "failed callback";
+                      die "failed callback";
                   }
                });
 
