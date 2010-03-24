@@ -11,6 +11,7 @@ has persistent => (is => "rw", isa => "Bool", default => sub { 0 });
 has buffer => (is => "ro", isa => "ArrayRef", default => sub { [] });
 has cv => (is => "rw", isa => "AnyEvent::CondVar", default => sub { AE::cv });
 has destroyed => (is => "rw", isa => "Bool", default => sub { 0 });
+has on_error  => (is => "rw");
 
 sub BUILD {
     my $self = shift;
@@ -35,7 +36,7 @@ sub subscribe {
 }
 
 sub _flush {
-    my($self, @messages) = @_;
+    my ($self, @messages) = @_;
 
     try {
         my $cb = $self->{cv}->cb;
@@ -56,7 +57,7 @@ sub _flush {
             weaken $self->{timer};
         }
     } catch {
-        warn $_;
+        $self->on_error->($self, $_) if $self->on_error;
         $self->destroyed(1);
     };
 }
