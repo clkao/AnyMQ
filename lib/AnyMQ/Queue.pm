@@ -12,6 +12,7 @@ has buffer => (is => "ro", isa => "ArrayRef", default => sub { [] });
 has cv => (is => "rw", isa => "AnyEvent::CondVar", default => sub { AE::cv });
 has destroyed => (is => "rw", isa => "Bool", default => sub { 0 });
 has on_error  => (is => "rw");
+has reaper  => (is => "rw");
 
 sub BUILD {
     my $self = shift;
@@ -47,14 +48,7 @@ sub _flush {
         if ($self->{persistent}) {
             $self->{cv}->cb($cb);
         } else {
-            $self->{timer} = AE::timer 30, 0, sub {
-                weaken $self;
-                warn "Sweep $self (no long-poll reconnect)";
-                undef $self;
-                # XXX: unsubscribe from all AnyMQ
-#                delete $self->clients->{$self_id};
-            };
-            weaken $self->{timer};
+            $self->{timer} = $self->reaper->();
         }
     } catch {
         $self->on_error->($self, $_) if $self->on_error;
@@ -70,14 +64,17 @@ sub poll_once {
     $self->{cv}->cb(sub { $cb->($_[0]->recv) });
 
     # reset garbage collection timeout with the long-poll timeout
-    # $timeout = 0 is a valid timeout for interval-polling
-    $timeout = 55 unless defined $timeout;
-    $self->{timer} = AE::timer $timeout || 55, 0, sub {
-        weaken $self;
-        warn "Timing out $self long-poll" if DEBUG;
-        $self->_flush;
-    };
-    weaken $self->{timer};
+    $self->reaper(sub { AnyEvent->timer( after => $timeout || 55,
+                                         cb => sub {
+                                             weaken $self;
+                                             warn "Timing out $self long-poll" if DEBUG;
+                                             $self->on_error->($self, "timeout")
+                                                 if $self->on_error;
+                                             $self->destroyed(1);
+                                         });
+                    });
+    $self->{timer} = $self->reaper->();
+    weaken $self->{reaper};
 
     # flush buffer for a long-poll client
     $self->_flush( @{ $self->{buffer} })
