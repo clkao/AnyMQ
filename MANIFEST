@@ -27,7 +27,10 @@ t/backlog.t
 t/basic-poll.t
 t/basic.t
 t/cycle.t
+t/downgrade.t
+t/error.t
 t/events_before_long_poll.t
+t/timeout.t
 t/trait.t
 xt/perlcritic.t
 xt/pod.t

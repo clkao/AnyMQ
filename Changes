@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyMQ
 
+0.30 Wed Mar 24 22:16:14 CST 2010
+        - Improve error and timeout handling
+        - Better test coverage
+
 0.29  Tue Mar  9 11:09:23 CST 2010
         - WithBacklog topic trait
         - Fix poll_once
