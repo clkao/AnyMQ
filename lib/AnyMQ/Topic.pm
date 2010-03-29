@@ -49,7 +49,6 @@ sub reap_destroyed_listeners {
         for grep { $_->destroyed } values %{$self->queues};
 
     if ($self->recycle && $self->has_no_listeners) {
-        warn "==> kill ".$self->name;
         delete $self->bus->topics->{$self->name};
     }
 }
