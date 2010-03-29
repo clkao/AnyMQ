@@ -5,8 +5,9 @@ use AnyMQ::Topic;
 my $bus = AnyMQ->new;
 
 sub do_test {
-    my $channel = $bus->topic({ name => 'test',
-                                recycle => 1 });
+    my $channel = $bus->topic({ name            => 'test',
+                                reaper_interval => 0,
+                                recycle         => 1 });
 
     my $cv = AE::cv;
     my $client = AnyMQ->new_listener($channel);
