@@ -14,24 +14,39 @@ with 'MooseX::Traits';
 
 has name => (is => 'rw', isa => 'Str');
 has bus => (is => "ro", isa => "AnyMQ", weak_ref => 1);
-has queues  => (is => 'rw', isa => 'HashRef',  default => sub { +{} });
+has queues => (traits => ['Hash'],
+               is => 'rw',
+               isa => 'HashRef',
+               default => sub { {} },
+               handles => {
+                   add_listener      => 'set',
+                   has_no_listeners  => 'is_empty',
+               }
+           );
 has '+_trait_namespace' => (default => 'AnyMQ::Topic::Trait');
 
-sub publish {
-    my($self, @messages) = @_;
-    for my $queue (values %{$self->queues}) {
-        if ($queue->destroyed) {
-            delete $self->queues->{$queue->id};
-            next;
-        }
+sub reap_destroyed_listeners {
+    my $self = shift;
+    $self->remove_subscriber($_)
+        for grep { $_->destroyed } values %{$self->queues};
+}
 
-        $queue->append(@messages);
+sub publish {
+    my ($self, @messages) = @_;
+    $self->reap_destroyed_listeners;
+    for (values %{$self->queues}) {
+        $_->append(@messages);
     }
 }
 
 sub add_subscriber {
     my ($self, $queue) = @_;
-    $self->queues->{$queue->id} = $queue;
+    $self->add_listener($queue->id, $queue);
+}
+
+sub remove_subscriber {
+    my ($self, $queue) = @_;
+    delete $self->queues->{$queue->id};
 }
 
 __PACKAGE__->meta->make_immutable;
