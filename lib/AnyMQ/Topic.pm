@@ -23,7 +23,23 @@ has queues => (traits => ['Hash'],
                    has_no_listeners  => 'is_empty',
                }
            );
+has 'reaper_interval' => (is => 'ro', isa => 'Int', default => sub { 30 });
+has '_listener_reaper' => (is => 'rw');
 has '+_trait_namespace' => (default => 'AnyMQ::Topic::Trait');
+
+sub BUILD {
+    my $self = shift;
+    $self->install_reaper if $self->reaper_interval;
+}
+
+sub install_reaper {
+    my $self = shift;
+
+    $self->_listener_reaper(
+        AnyEvent->timer(interval => $self->reaper_interval,
+                        cb => sub { $self->reap_destroyed_listeners })
+    );
+}
 
 sub reap_destroyed_listeners {
     my $self = shift;
@@ -37,6 +53,7 @@ sub publish {
     for (values %{$self->queues}) {
         $_->append(@messages);
     }
+    $self->install_reaper if $self->reaper_interval;
 }
 
 sub add_subscriber {
