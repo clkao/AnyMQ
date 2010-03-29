@@ -20,6 +20,8 @@ my $DEFAULT_BUS;
 sub topic {
     my ($self, $opt) = @_;
     $opt = { name => $opt } unless ref $opt;
+    $opt->{recycle} = 1 unless exists $opt->{recycle};
+
     unless (ref($self)) {
         $self = ($DEFAULT_BUS ||= $self->new);
     }
@@ -95,15 +97,16 @@ Returns a new L<AnyMQ> object, which is a message bus that can
 associate with arbitrary L<AnyMQ::Topic> and consumed by
 L<AnyMQ::Queue>
 
-=head2 topic($name)
+=head2 topic($name or %opt)
 
-Returns a L<AnyMQ::Topic> with given name.  If called as class method,
-the default bus will be used.
+Returns a L<AnyMQ::Topic> with given name or constructor options
+C<%opt>.  If called as class method, the default bus will be used.
+Topics not known to the current AnyMQ bus will be created.
 
-=head2 new_topic($name)
+=head2 new_topic($name or %opt)
 
-Creates and returns a new L<AnyMQ::Topic> object with given name.
-This should not be called directly.
+Creates and returns a new L<AnyMQ::Topic> object with given name or
+constructor options C<%opt>.  This should not be called directly.
 
 =head2 new_listener(@topic)
 

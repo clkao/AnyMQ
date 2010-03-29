@@ -23,6 +23,7 @@ has queues => (traits => ['Hash'],
                    has_no_listeners  => 'is_empty',
                }
            );
+has recycle => (is => "rw", isa => "Bool", default => sub { 0 });
 has 'reaper_interval' => (is => 'ro', isa => 'Int', default => sub { 30 });
 has '_listener_reaper' => (is => 'rw');
 has '+_trait_namespace' => (default => 'AnyMQ::Topic::Trait');
@@ -43,8 +44,14 @@ sub install_reaper {
 
 sub reap_destroyed_listeners {
     my $self = shift;
+    return if $self->has_no_listeners;
     $self->remove_subscriber($_)
         for grep { $_->destroyed } values %{$self->queues};
+
+    if ($self->recycle && $self->has_no_listeners) {
+        warn "==> kill ".$self->name;
+        delete $self->bus->topics->{$self->name};
+    }
 }
 
 sub publish {
@@ -88,6 +95,17 @@ AnyMQ::Topic - AnyMQ Topic
 An AnyMQ::Topic instance is a topic where messages can be published
 to, and L<AnyMQ::Queue> objects can subscribe to.  each message
 published to the topic will be appended to each subscribing queue.
+
+=head1 ATTRIBUTES
+
+=head2 recycle
+
+True if the topic should be recycled once all listeners are gone.
+
+=head2 reaper_interval
+
+Interval in seconds that destroyed listeners to this topic should be
+reaped and freed.
 
 =head1 METHODS
 
