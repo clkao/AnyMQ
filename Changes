@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyMQ
 
+0.31 Mon Mar 29 20:02:18 CST 2010
+        - Topic and Queue recycling infrastructure
+
 0.30 Wed Mar 24 22:16:14 CST 2010
         - Improve error and timeout handling
         - Better test coverage

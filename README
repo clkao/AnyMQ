@@ -31,13 +31,14 @@ METHODS
     Returns a new AnyMQ object, which is a message bus that can associate
     with arbitrary AnyMQ::Topic and consumed by AnyMQ::Queue
 
-  topic($name)
-    Returns a AnyMQ::Topic with given name. If called as class method, the
-    default bus will be used.
+  topic($name or %opt)
+    Returns a AnyMQ::Topic with given name or constructor options %opt. If
+    called as class method, the default bus will be used. Topics not known
+    to the current AnyMQ bus will be created.
 
-  new_topic($name)
-    Creates and returns a new AnyMQ::Topic object with given name. This
-    should not be called directly.
+  new_topic($name or %opt)
+    Creates and returns a new AnyMQ::Topic object with given name or
+    constructor options %opt. This should not be called directly.
 
   new_listener(@topic)
     Returns a new AnyMQ::Queue object, and subscribes to the optional given

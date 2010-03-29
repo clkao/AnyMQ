@@ -30,7 +30,9 @@ t/cycle.t
 t/downgrade.t
 t/error.t
 t/events_before_long_poll.t
+t/listener-reaper.pl
 t/timeout.t
+t/topic-reaper.pl
 t/trait.t
 xt/perlcritic.t
 xt/pod.t
