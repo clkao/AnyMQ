@@ -18,17 +18,19 @@ has topics => (is => "ro", isa => "HashRef[AnyMQ::Topic]",
 my $DEFAULT_BUS;
 
 sub topic {
-    my ($self, $name) = @_;
+    my ($self, $opt) = @_;
+    $opt = { name => $opt } unless ref $opt;
     unless (ref($self)) {
         $self = ($DEFAULT_BUS ||= $self->new);
     }
 
-    $self->topics->{$name} ||= $self->new_topic( $name );
+    $self->topics->{$opt->{name}} ||= $self->new_topic( $opt );
 }
 
 sub new_topic {
-    my ($self, $name) = @_;
-    AnyMQ::Topic->new( name => $name,
+    my ($self, $opt) = @_;
+    $opt = { name => $opt } unless ref $opt;
+    AnyMQ::Topic->new( %$opt,
                        bus  => $self );
 }
 
