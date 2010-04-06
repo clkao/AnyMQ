@@ -43,7 +43,10 @@ sub new_listener {
     }
 
     my $listener = AnyMQ::Queue->new;
-    $listener->subscribe(@_) if @_;
+    if (@_) {
+        $listener->subscribe($_)
+            for @_;
+    }
     return $listener;
 }
 
