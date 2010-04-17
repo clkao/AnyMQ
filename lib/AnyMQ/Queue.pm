@@ -181,19 +181,19 @@ Timeout value for this queue.  Default is 55.
 
 Sets the error handler invoked when C<poll> or C<poll_once> callbacks
 fail.  By default the queue is marked as destroyed.  If you register
-this error handler, you should call C<$queue->destroyed(1)> should you
+this error handler, you should call C<< $queue->destroyed(1) >> should you
 wish to mark the queue as destroyed and reclaim resources.
 
 Note that for queues that are currently C<poll>'ed, you may unset the
 C<persistent> attribute to avoid the queue from being destroyed, and
 can be used for further C<poll> or C<poll_once> calls.  In this case,
 C<on_timeout> will be triggered if C<poll> or C<poll_once> is not
-called after C<$self->timeout> seconds.
+called after C<< $self->timeout >> seconds.
 
 =head2 on_timeout(sub { my ($queue, $error) = @_; ... })
 
 If a queue is not currently polled, this callback will be triggered
-after <$self->timeout> seconds.  The default behaviour is marking the
+after C<< $self->timeout >> seconds.  The default behaviour is marking the
 queue as destroyed.
 
 =head2 append(@messages)
