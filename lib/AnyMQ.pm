@@ -4,11 +4,11 @@ use 5.008_001;
 our $VERSION = '0.31';
 
 use AnyEvent;
-use Moose;
+use Any::Moose;
 use AnyMQ::Topic;
 use AnyMQ::Queue;
 
-with 'MooseX::Traits';
+with any_moose("X::Traits");
 
 has '+_trait_namespace' => (default => 'AnyMQ::Trait');
 
@@ -51,7 +51,7 @@ sub new_listener {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
+no Any::Moose;
 1;
 
 __END__

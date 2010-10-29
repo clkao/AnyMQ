@@ -1,5 +1,5 @@
 package AnyMQ::Topic::Trait::WithBacklog;
-use Moose::Role;
+use Any::Moose "::Role";
 
 has backlog_length => (is => "rw", isa => "Int", default => sub { 30 });
 has backlog => (is => 'rw', isa => 'ArrayRef', default => sub { [] });

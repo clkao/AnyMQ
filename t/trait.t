@@ -5,7 +5,7 @@ use AnyMQ;
 our ($built, $demolished) = (0, 0);
 {
     package AnyMQ::Trait::Test;
-    use Moose::Role;
+    use Any::Moose "::Role";
     use Test::More;
 
     sub BUILD {}; after 'BUILD' => sub {

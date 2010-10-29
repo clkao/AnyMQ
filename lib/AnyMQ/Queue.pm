@@ -1,5 +1,5 @@
 package AnyMQ::Queue;
-use Moose;
+use Any::Moose;
 use AnyEvent;
 use Try::Tiny;
 use Scalar::Util qw(weaken refaddr);
@@ -117,7 +117,7 @@ sub poll {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
+no Any::Moose;
 1;
 
 __END__
