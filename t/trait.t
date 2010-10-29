@@ -20,7 +20,8 @@ our ($built, $demolished) = (0, 0);
 
 my $bus = AnyMQ->new_with_traits( traits => ['Test']);
 
-ok($bus->DOES('AnyMQ::Trait::Test'));
+# Mouse hasn't supported UNIVERSAL::DOES yet
+ok($bus->does('AnyMQ::Trait::Test') || $bus->isa('AnyMQ::Trait::Test'));
 
 ok($built);
 undef $bus;
