@@ -60,6 +60,8 @@ sub _flush {
 
     if ($self->{persistent}) {
         $self->{cv}->cb($cb);
+        $self->_flush( @{ $self->{buffer} })
+            if @{ $self->{buffer} };
     } else {
         $self->{timer} = $self->_reaper;
     }
