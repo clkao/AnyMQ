@@ -1,5 +1,10 @@
 Revision history for Perl extension AnyMQ
 
+0.32 Wed Dec 22 17:08:08 CST 2010
+        - Use Any::Moose
+        - Fix a bug when new messages are created during listener cb,
+          poll might not be called immediately
+
 0.31 Mon Mar 29 20:02:18 CST 2010
         - Topic and Queue recycling infrastructure
 

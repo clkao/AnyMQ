@@ -4,9 +4,11 @@ all_from 'lib/AnyMQ.pm';
 readme_from 'lib/AnyMQ.pm';
 build_requires 'Test::More';
 requires 'Any::Moose';
-requires 'MouseX::Traits';
 requires 'MouseX::NativeTraits';
 requires 'AnyEvent';
+requires_any_moose 'X::Traits';
+requires_any_moose 'X::Types::DateTime';
+
 test_requires 'Test::Requires';
 
 auto_include_deps;
