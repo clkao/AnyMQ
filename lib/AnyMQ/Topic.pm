@@ -5,12 +5,12 @@ use 5.008_001;
 our $VERSION = '0.01';
 
 use AnyEvent;
-use Moose;
+use Any::Moose;
 use Try::Tiny;
 use Scalar::Util;
 use Time::HiRes;
 
-with 'MooseX::Traits';
+with any_moose("X::Traits");
 
 has name => (is => 'rw', isa => 'Str');
 has bus => (is => "ro", isa => "AnyMQ", weak_ref => 1);
@@ -73,7 +73,7 @@ sub remove_subscriber {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
+no Any::Moose;
 1;
 
 =encoding utf-8
