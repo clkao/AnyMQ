@@ -7,7 +7,6 @@ requires 'Any::Moose';
 requires 'MouseX::NativeTraits';
 requires 'AnyEvent';
 requires_any_moose 'X::Traits';
-requires_any_moose 'X::Types::DateTime';
 
 test_requires 'Test::Requires';
 
