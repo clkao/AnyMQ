@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyMQ
 
+0.33 Sun Feb  6 21:33:30 CST 2011
+        - Remove unused dependency.
+
 0.32 Wed Dec 22 17:08:08 CST 2010
         - Use Any::Moose
         - Fix a bug when new messages are created during listener cb,

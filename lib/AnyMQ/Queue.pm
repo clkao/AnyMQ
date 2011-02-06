@@ -34,6 +34,7 @@ sub append {
 
 sub subscribe {
     my ($self, $topic) = @_;
+    Carp::cluck unless $topic;
     $topic->add_subscriber($self);
 }
 
