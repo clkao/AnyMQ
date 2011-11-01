@@ -55,6 +55,16 @@ sub reap_destroyed_listeners {
 
 sub publish {
     my ($self, @messages) = @_;
+    $self->append_to_queues(@messages);
+    $self->dispatch_messages(@messages);
+}
+
+sub dispatch_messages {
+    my ($self, @messages) = @_;
+}
+
+sub append_to_queues {
+    my ($self, @messages) = @_;
     $self->reap_destroyed_listeners;
     for (values %{$self->queues}) {
         $_->append(@messages);
