@@ -25,6 +25,7 @@ has queues => (traits => ['Hash'],
            );
 has recycle => (is => "rw", isa => "Bool", default => sub { 0 });
 has 'reaper_interval' => (is => 'ro', isa => 'Int', default => sub { 30 });
+has 'publish_to_queues' => (is => 'rw', isa => 'Bool', default => sub { 1 });
 has '_listener_reaper' => (is => 'rw');
 has '+_trait_namespace' => (default => 'AnyMQ::Topic::Trait');
 
@@ -55,7 +56,7 @@ sub reap_destroyed_listeners {
 
 sub publish {
     my ($self, @messages) = @_;
-    $self->append_to_queues(@messages);
+    $self->append_to_queues(@messages) if $self->publish_to_queues;
     $self->dispatch_messages(@messages);
 }
 
