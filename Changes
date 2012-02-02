@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyMQ
 
+0.34 Thu Feb  2 23:29:27 CST 2012
+        - Improvements for traits to override publish method.
+
 0.33 Sun Feb  6 21:33:30 CST 2011
         - Remove unused dependency.
 

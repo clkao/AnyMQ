@@ -32,6 +32,7 @@ t/downgrade.t
 t/error.t
 t/events_before_long_poll.t
 t/listener-reaper.pl
+t/publish_queues.t
 t/timeout.t
 t/topic-reaper.pl
 t/trait.t
