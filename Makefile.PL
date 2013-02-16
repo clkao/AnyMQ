@@ -11,6 +11,6 @@ requires_any_moose 'X::Traits';
 test_requires 'Test::Requires';
 
 auto_include_deps;
-author_tests('xt');
+
 auto_set_repository;
 WriteAll;
