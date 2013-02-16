@@ -6,7 +6,13 @@ build_requires 'Test::More';
 requires 'Any::Moose';
 requires 'MouseX::NativeTraits';
 requires 'AnyEvent';
-requires_any_moose 'X::Traits';
+
+if (my $moose = $ENV{ANY_MOOSE}) {
+    requires $moose.'X::Traits';
+}
+else {
+    requires_any_moose 'X::Traits';
+}
 
 test_requires 'Test::Requires';
 
