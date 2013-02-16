@@ -1,0 +1,8 @@
+before_script:
+  - "sudo cpanm Module::Install::ReadmeFromPod Module::Install::Any::Moose Test::Requires Module::Install::Repository"
+
+language: perl
+perl:
+  - "5.10"
+  - "5.12"
+  - "5.14"
