@@ -1,4 +1,4 @@
-before_script:
+before_install:
   - "sudo cpanm Module::Install::ReadmeFromPod Module::Install::Any::Moose Test::Requires Module::Install::Repository"
 
 language: perl
