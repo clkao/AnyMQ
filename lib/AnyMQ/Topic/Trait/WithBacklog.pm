@@ -1,4 +1,5 @@
 package AnyMQ::Topic::Trait::WithBacklog;
+use strict;
 use Any::Moose "::Role";
 
 has backlog_length => (is => "rw", isa => "Int", default => sub { 30 });

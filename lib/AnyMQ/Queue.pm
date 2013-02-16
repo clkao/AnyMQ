@@ -1,4 +1,5 @@
 package AnyMQ::Queue;
+use strict;
 use Any::Moose;
 use AnyEvent;
 use Try::Tiny;
