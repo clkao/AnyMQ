@@ -10,9 +10,7 @@ requires 'AnyEvent';
 if (my $moose = $ENV{ANY_MOOSE}) {
     requires $moose.'X::Traits';
 }
-else {
-    requires_any_moose 'X::Traits';
-}
+requires_any_moose 'X::Traits';
 
 test_requires 'Test::Requires';
 

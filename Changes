@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyMQ
 
+0.35 Sat Feb 16 18:34:24 CST 2013
+        - Support unpoll. [alexmv]
+
 0.34 Thu Feb  2 23:29:27 CST 2012
         - Improvements for traits to override publish method.
 

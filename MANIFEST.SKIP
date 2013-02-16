@@ -12,3 +12,10 @@
 \.gz$
 \.cvsignore
 \.shipit
+\.o
+\.c
+\.bs
+\.swp
+^.gitignore$
+^AnyMQ-.*
+^MYMETA.*
