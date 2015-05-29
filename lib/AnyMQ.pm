@@ -4,15 +4,17 @@ use 5.008_001;
 our $VERSION = '0.35';
 
 use AnyEvent;
-use Any::Moose;
+use Moo 2;
+use Types::Standard qw< :types >;
 use AnyMQ::Topic;
 use AnyMQ::Queue;
+use namespace::clean;
 
-with any_moose("X::Traits");
+with "MooX::Traits";
 
-has '+_trait_namespace' => (default => 'AnyMQ::Trait');
+sub _trait_namespace { 'AnyMQ::Trait' }
 
-has topics => (is => "ro", isa => "HashRef[AnyMQ::Topic]",
+has topics => (is => "ro", isa => HashRef[InstanceOf['AnyMQ::Topic']],
                default => sub { {} });
 
 my $DEFAULT_BUS;
@@ -50,8 +52,6 @@ sub new_listener {
     return $listener;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
 
 __END__

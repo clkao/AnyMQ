@@ -1,9 +1,11 @@
 package AnyMQ::Topic::Trait::WithBacklog;
 use strict;
-use Any::Moose "::Role";
+use Moo::Role 2;
+use Types::Standard qw< :types >;
+use namespace::clean;
 
-has backlog_length => (is => "rw", isa => "Int", default => sub { 30 });
-has backlog => (is => 'rw', isa => 'ArrayRef', default => sub { [] });
+has backlog_length => (is => "rw", isa => Int, default => sub { 30 });
+has backlog => (is => 'rw', isa => ArrayRef, default => sub { [] });
 
 sub backlog_events {
     my $self = shift;

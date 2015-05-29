@@ -1,9 +1,5 @@
 before_install:
-  - "cpanm Module::Install::ReadmeFromPod Module::Install::Any::Moose Test::Requires Module::Install::Repository"
-
-env:
-  - ANY_MOOSE=Moose
-  - ANY_MOOSE=Mouse
+  - "cpanm Module::Install::ReadmeFromPod Test::Requires Module::Install::Repository"
 
 language: perl
 perl:

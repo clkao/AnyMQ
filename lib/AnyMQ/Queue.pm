@@ -1,20 +1,22 @@
 package AnyMQ::Queue;
 use strict;
-use Any::Moose;
+use Moo 2;
+use Types::Standard qw< :types >;
 use AnyEvent;
 use Try::Tiny;
 use Scalar::Util qw(weaken refaddr);
 use Time::HiRes;
+use namespace::clean;
 use constant DEBUG => 0;
 
-has id => (is => 'rw', isa => 'Str');
-has persistent => (is => "rw", isa => "Bool", default => sub { 0 });
-has buffer => (is => "ro", isa => "ArrayRef", default => sub { [] });
-has cv => (is => "rw", isa => "AnyEvent::CondVar", default => sub { AE::cv });
-has destroyed => (is => "rw", isa => "Bool", default => sub { 0 });
+has id => (is => 'rw', isa => Str);
+has persistent => (is => "rw", isa => Bool, default => sub { 0 });
+has buffer => (is => "ro", isa => ArrayRef, default => sub { [] });
+has cv => (is => "rw", isa => InstanceOf["AnyEvent::CondVar"], default => sub { AE::cv });
+has destroyed => (is => "rw", isa => Bool, default => sub { 0 });
 has on_timeout => (is => "rw");
 has on_error  => (is => "rw");
-has timeout => (is => "rw", isa => "Int", default => sub { 55 });
+has timeout => (is => "rw", isa => Int, default => sub { 55 });
 
 sub BUILD {
     my $self = shift;
@@ -127,8 +129,6 @@ sub unpoll {
     $self->{timer} = $self->_reaper;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
 
 __END__
