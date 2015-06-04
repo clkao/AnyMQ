@@ -1,5 +1,5 @@
 before_install:
-  - "cpanm Module::Install::ReadmeFromPod Test::Requires Module::Install::Repository"
+  - "cpanm Module::Install::ReadmeFromPod Test::Requires Module::Install::Repository Test::Memory::Cycle"
 language: perl
 perl:
   - "5.20"
