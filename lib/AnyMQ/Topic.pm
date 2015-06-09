@@ -5,29 +5,33 @@ use 5.008_001;
 our $VERSION = '0.01';
 
 use AnyEvent;
-use Any::Moose;
+use Moo 2;
+use MooX::HandlesVia;
+use Types::Standard qw< :types >;
 use Try::Tiny;
 use Scalar::Util;
 use Time::HiRes;
+use namespace::clean;
 
-with any_moose("X::Traits");
+with "MooX::Traits";
 
-has name => (is => 'rw', isa => 'Str');
-has bus => (is => "ro", isa => "AnyMQ", weak_ref => 1);
-has queues => (traits => ['Hash'],
-               is => 'rw',
-               isa => 'HashRef',
+has name => (is => 'rw', isa => Str);
+has bus => (is => "ro", isa => InstanceOf['AnyMQ'], weak_ref => 1);
+has queues => (is => 'rw',
+               isa => HashRef,
                default => sub { {} },
+               handles_via => 'Hash',
                handles => {
                    add_listener      => 'set',
                    has_no_listeners  => 'is_empty',
                }
            );
-has recycle => (is => "rw", isa => "Bool", default => sub { 0 });
-has 'reaper_interval' => (is => 'ro', isa => 'Int', default => sub { 30 });
-has 'publish_to_queues' => (is => 'rw', isa => 'Bool', default => sub { 1 });
+has recycle => (is => "rw", isa => Bool, default => sub { 0 });
+has 'reaper_interval' => (is => 'ro', isa => Int, default => sub { 30 });
+has 'publish_to_queues' => (is => 'rw', isa => Bool, default => sub { 1 });
 has '_listener_reaper' => (is => 'rw');
-has '+_trait_namespace' => (default => 'AnyMQ::Topic::Trait');
+
+sub _trait_namespace { 'AnyMQ::Topic::Trait' }
 
 sub BUILD {
     my $self = shift;
@@ -83,8 +87,6 @@ sub remove_subscriber {
     delete $self->queues->{$queue->id};
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
 
 =encoding utf-8
